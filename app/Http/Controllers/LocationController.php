@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
 use App\Models\Location;
 use Illuminate\Http\Request;
 
@@ -10,7 +9,13 @@ class LocationController extends Controller
 {
     public function index()
     {
-        return response()->json(Location::all(), 200);
+        $locations = Location::all();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Get all locations',
+            'data' => $locations
+        ], 200);
     }
 
     public function store(Request $request)
@@ -21,7 +26,12 @@ class LocationController extends Controller
         ]);
 
         $location = Location::create($validated);
-        return response()->json($location, 201);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Location created successfully',
+            'data' => $location
+        ], 201);
     }
 
     public function show($id)
@@ -29,10 +39,17 @@ class LocationController extends Controller
         $location = Location::find($id);
 
         if (!$location) {
-            return response()->json(['message' => 'Location not found'], 404);
+            return response()->json([
+                'success' => false,
+                'message' => 'Location not found'
+            ], 404);
         }
 
-        return response()->json($location, 200);
+        return response()->json([
+            'success' => true,
+            'message' => 'Get location detail',
+            'data' => $location
+        ], 200);
     }
 
     public function update(Request $request, $id)
@@ -40,7 +57,10 @@ class LocationController extends Controller
         $location = Location::find($id);
 
         if (!$location) {
-            return response()->json(['message' => 'Location not found'], 404);
+            return response()->json([
+                'success' => false,
+                'message' => 'Location not found'
+            ], 404);
         }
 
         $validated = $request->validate([
@@ -49,7 +69,12 @@ class LocationController extends Controller
         ]);
 
         $location->update($validated);
-        return response()->json($location, 200);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Location updated successfully',
+            'data' => $location
+        ], 200);
     }
 
     public function destroy($id)
@@ -57,12 +82,18 @@ class LocationController extends Controller
         $location = Location::find($id);
 
         if (!$location) {
-            return response()->json(['message' => 'Location not found'], 404);
+            return response()->json([
+                'success' => false,
+                'message' => 'Location not found'
+            ], 404);
         }
 
         $location->delete();
-        return response()->json(['message' => 'Location deleted'], 200);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Location deleted successfully'
+        ], 200);
     }
+    
 }
-
-

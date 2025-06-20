@@ -1,29 +1,42 @@
 <?php
 
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\UserController;
-use App\Http\Controllers\LocationController;
+// routes/api.php
+
+use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ItemController;
-use App\Http\Controllers\ClaimController;
+use App\Http\Controllers\LocationController;
 use App\Http\Controllers\CommentController;
+use App\Http\Controllers\ClaimController;
 use App\Http\Controllers\NotificationController;
+use Illuminate\Support\Facades\Route;
+use Illuminate\Http\Request;
 
 
+Route::post('/register', [AuthController::class, 'register']);
+Route::post('/login', [AuthController::class, 'login']);
+Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:api');
 
-Route::get('/user', function (Request $request) {
-    return $request->user();
-})->middleware('auth:sanctum');
+Route::middleware(['auth:api'])->group(function () {
 
-Route::apiResource('users', App\Http\Controllers\UserController::class);
+    // Semua role (user/admin)
+    Route::apiResource('locations', LocationController::class);
+    Route::apiResource('items', ItemController::class);
+    Route::apiResource('comments', CommentController::class);
+    Route::apiResource('claims', ClaimController::class);
+    Route::apiResource('notifications', NotificationController::class);
 
-Route::apiResource('locations', App\Http\Controllers\LocationController::class);
+    // Khusus admin: Middleware CheckRole hanya untuk UPDATE dan DESTROY
+    Route::middleware('check.role:admin')->group(function () {
+        Route::patch('items/{item}', [ItemController::class, 'update']);
+        Route::delete('items/{item}', [ItemController::class, 'destroy']);
 
-Route::apiResource('items', App\Http\Controllers\ItemController::class);
+        Route::patch('comments/{comment}', [CommentController::class, 'update']);
+        Route::delete('comments/{comment}', [CommentController::class, 'destroy']);
 
-Route::apiResource('claims', App\Http\Controllers\ClaimController::class);
+        Route::patch('claims/{claim}', [ClaimController::class, 'update']);
+        Route::delete('claims/{claim}', [ClaimController::class, 'destroy']);
 
-Route::apiResource('comments', App\Http\Controllers\CommentController::class);
-
-Route::apiResource('notifications', App\Http\Controllers\NotificationController::class);
-
+        Route::patch('notifications/{notification}', [NotificationController::class, 'update']);
+        Route::delete('notifications/{notification}', [NotificationController::class, 'destroy']);
+    });
+});
