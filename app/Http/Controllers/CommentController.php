@@ -27,6 +27,7 @@ class CommentController extends Controller
         ]);
 
         $comment = Comment::create($validated);
+        $comment = Comment::with(['user', 'item'])->find($comment->id);
 
         return response()->json([
             'success' => true,
@@ -95,6 +96,21 @@ class CommentController extends Controller
             'message' => 'Comment deleted successfully'
         ], 200);
     }
+    public function byItem($id)
+{
+    $comments = Comment::with(['user', 'item'])
+                ->where('item_id', $id)
+                ->orderBy('created_at', 'desc')
+                ->get();
 
-    
+    return response()->json([
+        'success' => true,
+        'message' => 'Get comments by item ID',
+        'data' => $comments
+    ], 200);
+}
+
+
+
+
 }

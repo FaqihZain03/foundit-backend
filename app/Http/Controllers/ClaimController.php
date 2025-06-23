@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Claim;
+use App\Models\Item;
 use Illuminate\Http\Request;
 
 class ClaimController extends Controller
@@ -98,5 +99,22 @@ class ClaimController extends Controller
         ], 200);
     }
 
-    
+    public function byItem($id)
+    {
+        if (!Item::find($id)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Item not found'
+            ], 404);
+        }
+
+        $claims = Claim::where('item_id', $id)->with(['user', 'item'])->get();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Get claims by item ID',
+            'data' => $claims
+        ], 200);
+    }
+
 }

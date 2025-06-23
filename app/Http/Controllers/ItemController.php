@@ -88,6 +88,20 @@ class ItemController extends Controller
         return response()->json(['message' => 'Item deleted']);
     }
 
-    
+    public function claim($id)
+    {
+        try {
+            $item = Item::findOrFail($id);
+            $item->status = 'Claimed';
+            $item->save();
+
+            return response()->json(['message' => 'Item berhasil diklaim'], 200);
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'Gagal klaim item', 'error' => $e->getMessage()], 500);
+        }
+    }
+
+
+
 
 }

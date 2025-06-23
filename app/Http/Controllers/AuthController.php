@@ -71,6 +71,43 @@ class AuthController extends Controller
 
     }
 
+    public function adminLogin(Request $request)
+{
+    $validator = Validator::make($request->all(), [
+        'email' => 'required|email',
+        'password' => 'required'
+    ]);
+
+    if ($validator->fails()) {
+        return response()->json($validator->errors(), 422);
+    }
+
+    $credentials = $request->only('email', 'password');
+    $user = User::where('email', $credentials['email'])->first();
+
+    if (!$user || $user->role !== 'admin') {
+        return response()->json([
+            'success' => false,
+            'message' => 'Unauthorized: Anda bukan admin',
+        ], 403);
+    }
+
+    if (!$token = auth()->guard('api')->attempt($credentials)) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Unauthorized: Email atau password salah',
+        ], 401);
+    }
+
+    return response()->json([
+        'success' => true,
+        'message' => 'Login Admin Berhasil',
+        'user' => $user,
+        'token' => $token
+    ], 200);
+}
+
+
     public function logout(Request $request) {
 
         try {
