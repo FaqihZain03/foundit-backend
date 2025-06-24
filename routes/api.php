@@ -11,6 +11,7 @@ use App\Http\Controllers\NotificationController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
 use App\Http\Controllers\UserController;
+use App\Http\Middleware\CheckRole;
 
 
 Route::post('/register', [AuthController::class, 'register']);
@@ -34,14 +35,12 @@ Route::middleware(['auth:api'])->group(function () {
 
 
     // Khusus admin: Middleware CheckRole hanya untuk UPDATE dan DESTROY
-    Route::middleware('check.role:admin')->group(function () {
+    Route::middleware(\App\Http\Middleware\CheckRole::class.':admin')->group(function () {
         Route::patch('items/{item}', [ItemController::class, 'update']);
         Route::delete('items/{item}', [ItemController::class, 'destroy']);
 
         Route::patch('locations/{location}', [LocationController::class, 'update']);
         Route::delete('locations/{location}', [LocationController::class, 'destroy']);
-
-
 
         Route::patch('comments/{comment}', [CommentController::class, 'update']);
         Route::delete('comments/{comment}', [CommentController::class, 'destroy']);
